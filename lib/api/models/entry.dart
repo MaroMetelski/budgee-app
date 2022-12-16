@@ -6,7 +6,7 @@ class Entry {
   final String cr;
   final String dr;
   final String description;
-  final List<dynamic> tags;
+  final List<String> tags;
 
   const Entry({
     required this.id,
@@ -28,7 +28,7 @@ class Entry {
       cr: json["credit_account"],
       dr: json["debit_account"],
       description: json["description"],
-      tags: json["tags"],
+      tags: json["tags"].isNotEmpty ? List<String>.from(json["tags"]) : <String>[],
     );
   }
 

@@ -18,7 +18,7 @@ class Account {
       id: json["id"],
       name: json["name"],
       type: json["type"],
-      extraType: json["extraType"],
+      extraType: json["extra_type"],
       description: json["description"],
     );
   }

@@ -1,4 +1,6 @@
-import 'api/api.dart';
+import 'package:frontend/app/models/transaction.dart';
+
+import 'app/app.dart';
 import 'api/models/entry.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,12 +13,12 @@ class EntryPage extends StatefulWidget {
 }
 
 class _EntryPageState extends State<EntryPage> {
-  late Future<List<Entry>> futureEntries;
+  late Future<List<TransactionModel>> futureTransactions;
 
   @override
   void initState() {
     super.initState();
-    futureEntries = Provider.of<ApiService>(context, listen: false).getEntries();
+    futureTransactions = Provider.of<Application>(context, listen: false).getTransactions();
   }
 
   @override
@@ -26,19 +28,20 @@ class _EntryPageState extends State<EntryPage> {
         title: const Text("Entries"),
       ),
       body: Center(
-        child: FutureBuilder<List<Entry>>(
-          future: futureEntries,
+        child: FutureBuilder<List<TransactionModel>>(
+          future: futureTransactions,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return ListView.builder(
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
-                  var currentEntry = snapshot.data![index];
+                  var currentTransaction = snapshot.data![index];
                   return ListTile(
                     /* If entry.cr == asset -> minus sign */
-                    leading: Text(currentEntry.cr == "checking" ? "-${currentEntry.amount}" : currentEntry.amount),
-                    title: Text(currentEntry.cr),
-                    subtitle: Text(currentEntry.dr),
+                    leading: Text(currentTransaction.type.repr),
+                    title: Text(currentTransaction.from),
+                    subtitle: Text(currentTransaction.to),
+                    trailing: Text(currentTransaction.amount.toString()),
                   );
                 }
               );

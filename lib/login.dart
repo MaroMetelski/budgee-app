@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'api/api.dart';
-import 'entry.dart';
+import 'app/app.dart';
+import 'transaction.dart';
 
 
 class LoginPage extends StatefulWidget {
@@ -21,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
 
     void onButton(name, password) async {
-      _loggedIn = await Provider.of<ApiService>(context, listen: false).getLogin(name, password);
+      _loggedIn = await Provider.of<Application>(context, listen: false).api.getLogin(name, password);
      if (mounted && _loggedIn) {
       Navigator.pushAndRemoveUntil(
           context,

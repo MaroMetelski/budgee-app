@@ -1,7 +1,5 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'models/entry.dart';
@@ -14,7 +12,7 @@ class Constants {
   static String account = "/account";
 }
 
-class ApiService extends ChangeNotifier {
+class ApiService {
   final FlutterSecureStorage storage;
   ApiService(this.storage);
 
@@ -26,8 +24,8 @@ class ApiService extends ChangeNotifier {
     return storage.read(key: 'token');
   }
 
-  Future<http.Response> httpGet(path, headers) async {
-    var url = Uri.parse(Constants.url + path);
+  Future<http.Response> httpGet(path, headers, {params}) async {
+    var url = Uri.parse(Constants.url + path).replace(queryParameters: params);
     var resp = await http.get(url, headers: headers);
     if (resp.statusCode == 200) {
       return resp;
@@ -36,7 +34,7 @@ class ApiService extends ChangeNotifier {
     }
   }
 
-  Future<http.Response> httpGetWithToken(path) async {
+  Future<http.Response> httpGetWithToken(path, {params}) async {
       String? token = await getToken();
       if (token == null) {
         throw Exception("Token not present");
@@ -44,7 +42,7 @@ class ApiService extends ChangeNotifier {
       var headers = {
         'Authorization': 'Bearer $token'
       };
-      return httpGet(path, headers);
+      return httpGet(path, headers, params: params);
   }
 
   Future<http.Response> httpPost(path, headers, {body}) async {
@@ -68,7 +66,6 @@ class ApiService extends ChangeNotifier {
       return httpPost(path, headers, body: body);
   }
 
-
   Future<bool> getLogin(user, password) async {
     String encodedUserData = base64.encode(utf8.encode('$user:$password'));
     var headers = {
@@ -91,8 +88,11 @@ class ApiService extends ChangeNotifier {
     return entries;
   }
 
-  Future<List<Account>> getAccounts() async {
-    http.Response resp = await httpGetWithToken(Constants.entry);
+  Future<List<Account>> getAccounts({name, type}) async {
+    http.Response resp = await httpGetWithToken(Constants.account, params: {
+        'name': name,
+        'type': type,
+      });
     Iterable results = jsonDecode(resp.body);
     List<Account> accounts = results.map((model) => Account.fromJson(model)).toList();
     return accounts;
